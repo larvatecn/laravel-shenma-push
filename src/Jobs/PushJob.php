@@ -48,12 +48,12 @@ class PushJob implements ShouldQueue
     public function __construct(ShenmaPushModel $push)
     {
         $this->push = $push;
+        $this->site = parse_url(config('app.url'), PHP_URL_HOST);
         if (function_exists('settings')) {
-            $this->site = config('app.url');
+            $this->site = parse_url(config('app.url'), PHP_URL_HOST);
             $this->username = settings('system.shenma_username');
             $this->token = settings('system.shenma_token');
         } else {
-            $this->site = config('services.shenma.site');
             $this->username = config('services.shenma.username');
             $this->token = config('services.shenma.token');
         }
