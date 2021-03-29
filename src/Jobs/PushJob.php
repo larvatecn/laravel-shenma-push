@@ -14,7 +14,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Larva\Shenma\Push\ShenmaPushModel;
-use Larva\Support\HttpResponse;
 
 /**
  * 推送 Url
@@ -50,7 +49,6 @@ class PushJob implements ShouldQueue
         $this->push = $push;
         $this->site = parse_url(config('app.url'), PHP_URL_HOST);
         if (function_exists('settings')) {
-            $this->site = parse_url(config('app.url'), PHP_URL_HOST);
             $this->username = settings('system.shenma_username');
             $this->token = settings('system.shenma_token');
         } else {
@@ -68,9 +66,9 @@ class PushJob implements ShouldQueue
     {
         try {
             if ($this->push->type == ShenmaPushModel::TYPE_MIP) {
-                $response = Http::contentType('text/plain')->post("https://data.zhanzhang.sm.cn/push?site={$this->site}&user_name={$this->username}&resource_name=mip_add&token={$this->token}", [
-                    'body' => $this->push->url
-                ]);
+                $response = Http::acceptJson()
+                    ->withBody($this->push->url, 'text/plain')
+                    ->post("https://data.zhanzhang.sm.cn/push?site={$this->site}&user_name={$this->username}&resource_name=mip_add&token={$this->token}");
                 if (isset($response['returnCode']) && $response['returnCode'] != 200) {
                     $this->push->setFailure($response['errorMsg']);
                 } else {
