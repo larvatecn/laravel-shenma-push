@@ -1,13 +1,15 @@
 <?php
 /**
- * @copyright Copyright (c) 2018 Jinan Larva Information Technology Co., Ltd.
- * @link http://www.larvacent.com/
- * @license http://www.larvacent.com/license/
+ * This is NOT a freeware, use is subject to license terms
+ * @copyright Copyright (c) 2010-2099 Jinan Larva Information Technology Co., Ltd.
+ * @link http://www.larva.com.cn/
  */
 
 namespace Larva\Shenma\Push;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * 神马搜索Ping
@@ -17,11 +19,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $status
  * @property string $msg
  * @property int $failures
- * @property \Illuminate\Support\Carbon|null $push_at
+ * @property Carbon|null $push_at
  *
  * @property-read boolean $failure
- * @method static \Illuminate\Database\Eloquent\Builder|ShenmaPush failure()
- * @method static \Illuminate\Database\Eloquent\Builder|ShenmaPush pending()
+ * @method static Builder|ShenmaPush failure()
+ * @method static Builder|ShenmaPush pending()
  *
  * @author Tongle Xu <xutongle@gmail.com>
  */
@@ -57,16 +59,16 @@ class ShenmaPushModel extends Model
      * @var array
      */
     protected $attributes = [
-        'status' => 0b0
+        'status' => 0
     ];
 
     /**
      * 查询等待的推送
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $query
+     * @return Builder
      */
-    public function scopePending($query)
+    public function scopePending(Builder $query): Builder
     {
         return $query->where('status', '=', static::STATUS_PENDING);
     }
@@ -74,10 +76,10 @@ class ShenmaPushModel extends Model
     /**
      * 查询失败的推送
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $query
+     * @return Builder
      */
-    public function scopeFailure($query)
+    public function scopeFailure(Builder $query): Builder
     {
         return $query->where('status', '=', static::STATUS_FAILURE);
     }
@@ -86,7 +88,7 @@ class ShenmaPushModel extends Model
      * 是否已失败
      * @return boolean
      */
-    public function getFailureAttribute()
+    public function getFailureAttribute(): bool
     {
         return $this->status == static::STATUS_FAILURE;
     }
@@ -96,7 +98,7 @@ class ShenmaPushModel extends Model
      * @param string $msg
      * @return bool
      */
-    public function setFailure($msg)
+    public function setFailure(string $msg): bool
     {
         return $this->update(['status' => static::STATUS_FAILURE, 'msg' => $msg, 'failures' => $this->failures + 1, 'push_at' => $this->freshTimestamp()]);
     }
@@ -105,7 +107,7 @@ class ShenmaPushModel extends Model
      * 设置推送成功
      * @return bool
      */
-    public function setSuccess()
+    public function setSuccess(): bool
     {
         return $this->update(['status' => static::STATUS_SUCCESS, 'msg' => 'ok', 'failures' => 0, 'push_at' => $this->freshTimestamp()]);
     }

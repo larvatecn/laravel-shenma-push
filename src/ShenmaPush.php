@@ -1,13 +1,11 @@
 <?php
 /**
- * @copyright Copyright (c) 2018 Jinan Larva Information Technology Co., Ltd.
- * @link http://www.larvacent.com/
- * @license http://www.larvacent.com/license/
+ * This is NOT a freeware, use is subject to license terms
+ * @copyright Copyright (c) 2010-2099 Jinan Larva Information Technology Co., Ltd.
+ * @link http://www.larva.com.cn/
  */
 
 namespace Larva\Shenma\Push;
-
-use Larva\Shenma\Push\Jobs\UpdateJob;
 
 /**
  * 推送快捷方法
@@ -35,7 +33,6 @@ class ShenmaPush
     {
         if (($ping = ShenmaPushModel::query()->where('url', '=', $url)->first()) != null) {
             $ping->update(['status' => ShenmaPushModel::STATUS_PENDING]);
-            UpdateJob::dispatch($ping);
         } else {
             static::push($url);
         }
